@@ -59,6 +59,7 @@ services:
       - 5335:5335/udp
     networks:
       - internal_net
+      - external_net
     environment:
       TZ: "Europe/Kiev"
     volumes:
