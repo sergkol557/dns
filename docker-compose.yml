@@ -54,9 +54,6 @@ services:
   unbound:
     container_name: unbound
     image: madnuttah/unbound
-    ports:
-      - 5335:5335/tcp
-      - 5335:5335/udp
     networks:
       - internal_net
       - external_net
