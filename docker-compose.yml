@@ -33,7 +33,7 @@ services:
       FTLCONF_webserver_api_password: '${WEB_PASSWORD}'
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
       FTLCONF_dns_listeningMode: 'all'
-      FTLCONF_dns_upstreams: 'unbound#5353'
+      FTLCONF_dns_upstreams: 'unbound#5335'
       ADDITIONAL_PACKAGES: 'wget curl sqlite3 sqlite'
     # Volumes store your data between container upgrades
     volumes:
