@@ -33,22 +33,34 @@ Pi-hole uses Unbound as its upstream DNS server, creating a private, secure, and
    cd dns
    ```
 
-2. Start the services:
+2. Copy the example environment file and adjust the ports if needed:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Start the services:
    ```bash
    docker-compose up -d
    ```
 
-3. Access the Pi-hole web interface:
-   - Open `http://<your-server-ip>:8080` in your browser
+4. Access the Pi-hole web interface:
+   - Open `http://<your-server-ip>:8085` in your browser (or the port specified in your .env file)
    - Default password: `staple`
 
 ## Configuration
 
+### Environment Variables
+
+The service ports can be configured through environment variables in the `.env` file:
+
+- `WEB_PORT`: Port for the Pi-hole web interface (default: 8085)
+- `HTTPS_PORT`: Port for the Pi-hole HTTPS web interface (default: 8443)
+- `DNS_PORT`: Port for DNS queries (default: 5353)
+
 ### Pi-hole
 
-- Web interface: `http://localhost:8080`
+- Web interface: `http://localhost:8085` (by default)
 - Password: `staple` (change this in [docker-compose.yml](docker-compose.yml))
-please change the password in [docker-compose.yml](docker-compose.yml)
 - Timezone: Europe/Kiev (change in [docker-compose.yml](docker-compose.yml))
 
 ### Unbound
@@ -65,7 +77,7 @@ The setup includes multiple block lists for comprehensive protection:
 
 ### Pi-hole Block Lists
 
-Managed through [pihole/add_blocklists.sh](pihole/add_blocklists.sh):
+Managed through [pihole/adlists.list](pihole/adlists.list):
 - Hagezi Pro Plus
 - Blocklist Project (ads, phishing, fraud, malware)
 - Firebog lists
@@ -73,26 +85,38 @@ Managed through [pihole/add_blocklists.sh](pihole/add_blocklists.sh):
 - YoYo adservers
 - FadeMind lists
 - URLhaus
+- Hagezi tracker lists (Amazon, Apple, Huawei, Windows, TikTok, WebOS, Vivo, Oppo, Xiaomi)
+- Hagezi threat intelligence
+
+To update the block lists in Pi-hole:
+```bash
+./pihole/add_blocklists.sh
+```
 
 ### Unbound Block Lists
 
 Managed through [unbound/update_unbound_blocklist.sh](unbound/update_unbound_blocklist.sh):
 - Same sources as Pi-hole for redundancy
 
+To update the block lists in Unbound:
+```bash
+./unbound/update_unbound_blocklist.sh
+```
+
 ## Usage
 
 ### Adding Custom Block Lists
 
 To add custom block lists to Pi-hole:
-1. Edit [pihole/add_blocklists.sh](pihole/add_blocklists.sh)
-2. Add your list in the `BLOCKLISTS` array format: `"name|url"`
+1. Edit [pihole/adlists.list](pihole/adlists.list)
+2. Add your list in the format: `name|url`
 3. Run the script: `./pihole/add_blocklists.sh`
 
 ### Updating Block Lists
 
 To update Pi-hole block lists:
 ```bash
-docker-compose exec pihole pihole -g
+./pihole/add_blocklists.sh
 ```
 
 To update Unbound block lists:
@@ -113,20 +137,22 @@ To use this DNS server on your network:
 1. Configure your router's DHCP settings to use this server's IP as the DNS server
 2. Or configure individual devices to use this server's IP as their DNS server
 
-Pi-hole listens on port 53535 for DNS queries.
+Pi-hole listens on port 5353 for DNS queries by default (configurable via DNS_PORT in .env file).
 
 ## Directory Structure
 
 ```
 .
-├── docker-compose.yml          # Main Docker Compose configuration
+├── .env.example              # Example environment configuration
+├── docker-compose.yml        # Main Docker Compose configuration
 ├── pihole/
-│   ├── etc/                    # Pi-hole configuration and databases
-│   │   ├── pihole.toml         # Pi-hole configuration file
-│   │   └── dnsmasq.conf        # DNS configuration
-│   └── add_blocklists.sh       # Script to add block lists to Pi-hole
+│   ├── etc/                  # Pi-hole configuration and databases
+│   │   ├── pihole.toml       # Pi-hole configuration file
+│   │   └── dnsmasq.conf      # DNS configuration
+│   ├── add_blocklists.sh     # Script to add block lists to Pi-hole
+│   └── adlists.list          # List of block lists to use
 └── unbound/
-    ├── unbound.conf            # Unbound DNS resolver configuration
+    ├── unbound.conf          # Unbound DNS resolver configuration
     ├── update_unbound_blocklist.sh  # Script to update Unbound block lists
     └── update_unbound_roothints.sh  # Script to update root hints
 ```
@@ -152,7 +178,7 @@ docker-compose logs unbound
 
 ### Test DNS resolution
 ```bash
-dig @localhost -p 53535 example.com
+dig @localhost -p 5353 example.com
 ```
 
 ## Maintenance
