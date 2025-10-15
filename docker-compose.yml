@@ -30,7 +30,7 @@ services:
       # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones, e.g:
       TZ: 'Europe/Kiev'
       # Set a password to access the web interface. Not setting one will result in a random password being assigned
-      FTLCONF_webserver_api_password: 'staple'
+      FTLCONF_webserver_api_password: '${WEB_PASSWORD}'
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
       FTLCONF_dns_listeningMode: 'all'
       FTLCONF_dns_upstreams: 'unbound#5353'
@@ -54,8 +54,9 @@ services:
   unbound:
     container_name: unbound
     image: madnuttah/unbound
-    expose:
-      - "5353"
+    ports:
+      - 5335:5335/tcp
+      - 5335:5335/udp
     networks:
       - internal_net
     environment:
