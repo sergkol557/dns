@@ -1,0 +1,16 @@
+# Gitignore for DNS Ad Blocking Setup
+
+# Ignore Pi-hole subdirectories
+pihole/dnsmasq.d/
+pihole/etc/
+
+# Ignore Unbound subdirectories
+unbound/conf.d/
+unbound/zones.d/
+
+# Ignore other common files
+*.log
+*.tmp
+*.backup
+.DS_Store
+.env
